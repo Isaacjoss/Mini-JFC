@@ -1,0 +1,11 @@
+# analysis_config — configuración del análisis (texto plano; comentarios con #)
+# Rellena los valores; los marcadores TODO los sustituye el agente planificador.
+
+nombre = TODO
+objetivo_fisico = TODO
+fase_actual = phase1_strategy
+dataset = TODO
+energia_centro_de_masa_tev = TODO
+luminosidad_integrada_pb_minus1 = TODO
+variables_de_interes = TODO
+notas = TODO

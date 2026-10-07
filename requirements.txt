@@ -1,0 +1,14 @@
+# Mini-JFC: dependencias externas.
+# src/tools/parquet_tools.py usa pyarrow (lectura de Parquet), sin pandas.
+pyarrow>=14.0
+# src/tools/root_tools.py usa uproot (lectura ROOT) y awkward-array, sin PyROOT.
+uproot>=5.0
+awkward>=2.0
+#
+# El resto del proyecto usa unicamente Python estandar:
+# src/scaffold_analysis.py usa argparse, pathlib y shutil.
+#
+# No se usan frameworks de agentes en esta etapa:
+#   - LangChain
+#   - LangGraph
+#   - CrewAI
