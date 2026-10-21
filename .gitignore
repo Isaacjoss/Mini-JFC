@@ -6,3 +6,6 @@ __pycache__/
 .env
 *.key
 analyses/*/data/
+
+data/*
+!data/README.md
