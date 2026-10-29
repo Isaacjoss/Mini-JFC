@@ -1,0 +1,62 @@
+{
+  "actualizado": "2026-10-28",
+  "destino_autorizado": "data/prueba_d/ (enlace simbolico a /mnt/d/Mini-JFC/prueba, disco D:)",
+  "herramienta": "aria2c -c -x 8 -s 8 -k 10M --file-allocation=none --auto-file-renaming=false --max-tries=5 --retry-wait=30 --connect-timeout=30 --timeout=60",
+  "descargas": [
+    {
+      "recid": 12358,
+      "archivo": "Run2012B_TauPlusX.root",
+      "destino": "data/prueba_d/Run2012B_TauPlusX.root",
+      "url": "https://opendata.cern.ch/eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/Run2012B_TauPlusX.root",
+      "tamano_declarado_bytes": 10918632568,
+      "tamano_en_disco_bytes": 10918632568,
+      "estado": "completa",
+      "intentos": 2,
+      "error_literal": null,
+      "notas": "Primer intento aria2c interrumpido por reinicio del servidor WSL el 2026-10-28; segundo intento reanudo desde el parcial y termino. Un intento adicional con curl se cancelo al detectarse que colisionaba con el aria2c ya activo sobre el mismo destino; no se usa. Sin archivo .aria2 residual."
+    },
+    {
+      "recid": 31102,
+      "archivo": "24603428-8B2E-44B3-9E97-B991129E184D.root",
+      "destino": "data/prueba_d/24603428-8B2E-44B3-9E97-B991129E184D.root",
+      "url": "https://opendata.cern.ch/eos/opendata/cms/derived-data/NanoAODRun1/01-Jul-22/MonteCarlo12_Summer12_DR53X_TTbar_8TeV-Madspin_aMCatNLO-herwig/24603428-8B2E-44B3-9E97-B991129E184D.root",
+      "tamano_declarado_bytes": 1986138847,
+      "tamano_en_disco_bytes": 1986138847,
+      "estado": "completa",
+      "intentos": 1,
+      "error_literal": null,
+      "notas": "Un solo archivo suelto de los 17 del recid 31102; nunca se descargo el *_merged.root. Sin archivo .aria2 residual."
+    },
+    {
+      "recid": 12355,
+      "archivo": "W1JetsToLNu.root",
+      "destino": "data/prueba_d/W1JetsToLNu.root",
+      "url": "https://opendata.cern.ch/eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/W1JetsToLNu.root",
+      "tamano_declarado_bytes": 10731401995,
+      "tamano_en_disco_bytes": 10731401995,
+      "estado": "completa",
+      "intentos": 2,
+      "error_literal": null,
+      "notas": "Primer intento aria2c interrumpido por el reinicio del servidor WSL; segundo intento reanudo desde el parcial y termino. Sin archivo .aria2 residual."
+    },
+    {
+      "recid": 12353,
+      "archivo": "DYJetsToLL.root",
+      "destino": "data/prueba_d/DYJetsToLL.root",
+      "url": "https://opendata.cern.ch/eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/DYJetsToLL.root",
+      "tamano_declarado_bytes": 9247252629,
+      "tamano_en_disco_bytes": 9247252629,
+      "estado": "completa",
+      "intentos": 2,
+      "error_literal": null,
+      "notas": "Se borro el resto truncado previo de 119673824 B antes de re-descargar. Primer intento aria2c interrumpido por el reinicio del servidor WSL; segundo intento reanudo desde el parcial y termino. Sin archivo .aria2 residual."
+    }
+  ],
+  "restos_no_validos": [
+    {
+      "ruta": "data/prueba/DYJetsToLL.root",
+      "tamano_bytes": 81264640,
+      "estado": "resto incompleto antiguo, no usado, no borrado (fuera del alcance autorizado)"
+    }
+  ]
+}

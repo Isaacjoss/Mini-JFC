@@ -59,7 +59,7 @@ Lee, en este orden: `analyses/<nombre>/prompt.md`, `analysis_config`, `experimen
 
 # Reglas
 
-- Solo cites tamaños, años, energías o metadatos de un recid si existe su archivo en `phase2_exploration/files/` (`record_<recid>.json` o `files_<recid>.json`); cita el nombre del archivo. Si no existe, escribe "no verificado" y añade a "Riesgos y preguntas abiertas": "requiere que data_agent guarde la ficha de <recid>".
+- Solo cites tamaños o metadatos de un `recid` si existe su ficha en `phase2_exploration/files/` (`record_<recid>.json` o `files_<recid>.json`); cita el nombre del archivo. Si no, escribe "no verificado" y añade a "Riesgos y preguntas abiertas": "requiere que data_agent guarde la ficha de <recid>".
 - Todo valor numérico (luminosidad, secciones eficaces, cortes, umbrales) debe tener fuente: el `prompt.md`, un archivo del análisis o una referencia citada por nombre. Sin fuente: escribe "pendiente de fuente".
 - Todo dato no confirmado en una fuente directa se marca "inferido" o "pendiente".
 - No amplíes el alcance del `prompt.md`. Si el usuario pidió cualitativo, no planifiques ajustes.

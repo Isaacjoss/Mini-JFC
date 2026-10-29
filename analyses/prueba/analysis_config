@@ -1,11 +1,17 @@
 # analysis_config — configuración del análisis (texto plano; comentarios con #)
 # Rellena los valores; los marcadores TODO los sustituye el agente planificador.
 
-nombre = TODO
-objetivo_fisico = TODO
-fase_actual = phase1_strategy
-dataset = TODO
-energia_centro_de_masa_tev = TODO
-luminosidad_integrada_pb_minus1 = TODO
-variables_de_interes = TODO
-notas = TODO
+nombre = prueba
+objetivo_fisico = Búsqueda de H -> tau tau en el canal mu tau_h con CMS Open Data 2012 (validación cualitativa)
+fase_actual = phase3_processing
+dataset = senal ggF HToTauTau (recid 12351, descargado); senal VBF HToTauTau (12352, descargado); fondo Z->tautau DYJetsToLL (12353, propuesto); fondo W+jets W1JetsToLNu (12355, propuesto); fondo ttbar (31102, un archivo suelto, propuesto); datos Run2012B_TauPlusX (12358, propuesto)
+energia_centro_de_masa_tev = 8
+anio = 2012
+canal = mu tau_h
+# Luminosidad: sin fuente directa. La ficha de 12351-12364 no la declara
+# (phase2_exploration/candidatos_datasets.md) y el ROOT no la contiene
+# (phase2_exploration/inventario_datos.md). HIG-13-004 (citado en prompt.md) no se ha
+# leido en esta sesion: se deja pendiente de fuente, sin valor.
+luminosidad_integrada_pb_minus1 = pendiente_de_fuente
+variables_de_interes = Muon_pt, Muon_eta, Muon_phi, Muon_mass, Muon_charge, Muon_pfRelIso03_all, Muon_tightId, Muon_dxy, Muon_dz; Tau_pt, Tau_eta, Tau_phi, Tau_mass, Tau_charge, Tau_decayMode, Tau_relIso_all, Tau_idIsoMedium, Tau_idIsoTight, Tau_idAntiMuLoose, Tau_idAntiMuTight, Tau_idAntiEleLoose, Tau_idAntiEleMedium; MET_pt, MET_phi; Jet_pt, Jet_eta, Jet_phi, Jet_btag, Jet_puId; PV_npvs, nMuon, nTau, nJet; HLT_IsoMu24_eta2p1, HLT_IsoMu24, HLT_IsoMu17_eta2p1_LooseIsoPFTau20; derivadas m_vis(mu,tau_h), dR(mu,tau_h), pT del par, dphi(mu,MET), MET transverse mass; MC truth GenPart_pt, GenPart_eta, GenPart_phi, GenPart_pdgId, GenPart_status
+notas = Año 2012: según título y descripción del récord 12350 (campo year del catálogo: null). Energía 8 TeV: inferida de HIG-13-004, sin confirmar. El récord es solo cualitativo.

@@ -31,7 +31,16 @@ try:  # uproot+awkward (requirements.txt): opcionales para el resto de comandos
 except ImportError:  # pragma: no cover
     root_tools = None
 
+try:  # numpy (dependencia de awkward): necesario para analysis
+    from src.tools import analysis_tools
+except ImportError:  # pragma: no cover
+    analysis_tools = None
+
 DEFAULT_MAX_ITEMS = 20
+# Listas que forman parte del resultado de una tool y no deben recortarse con --max-items.
+_PROTECTED_KEYS = frozenset(
+    {"cuts", "inputs", "event_counts", "branches_used", "bins", "sumw2"}
+)
 
 
 # ---------------------------------------------------------------- utilidades
@@ -62,7 +71,9 @@ def _truncate(result, max_items: int):
     if isinstance(result, dict):
         out, total, truncated = {}, 0, False
         for key, value in result.items():
-            if isinstance(value, list) and len(value) > max_items:
+            if key in _PROTECTED_KEYS:
+                out[key] = value
+            elif isinstance(value, list) and len(value) > max_items:
                 out[key] = value[:max_items]
                 total = max(total, len(value))
                 truncated = True
@@ -178,6 +189,38 @@ def _parquet_summary(args):
     return _require(parquet_tools, "parquet_tools").column_summary(args.path, args.column)
 
 
+# ---------------------------------------------------------------- handlers analysis
+
+
+def _analysis_select(args):
+    return _require(analysis_tools, "analysis_tools").select(
+        args.inputs,
+        args.cuts,
+        tree=args.tree,
+        label=args.label,
+        out=args.out,
+    )
+
+
+def _analysis_hist(args):
+    return _require(analysis_tools, "analysis_tools").hist(
+        args.inputs,
+        args.observable,
+        args.bins,
+        args.range,
+        tree=args.tree,
+        mode=args.mode,
+        selection=args.selection,
+        cuts_path=args.cuts,
+        weights=args.weights,
+        normalize=args.normalize,
+        object_cut=args.object_cut,
+        object_source=args.object_source,
+        label=args.label,
+        out=args.out,
+    )
+
+
 # ------------------------------------------------------------------- parser
 
 
@@ -206,10 +249,14 @@ def build_parser() -> argparse.ArgumentParser:
             f"se recortan a --max-items (defecto {DEFAULT_MAX_ITEMS})."
         ),
         epilog="Ejemplos: mjfc lit arxiv 'Higgs tau' -n 3 ; mjfc lit arxiv 'Higgs tau' --cat hep-ex ; "
-        "mjfc parquet describe f.parquet ; mjfc --max-items 5 cms search tautau",
+        "mjfc parquet describe f.parquet ; mjfc --max-items 5 cms search tautau ; "
+        "mjfc analysis select f.root --tree events --cuts cuts.json --out cutflow.json ; "
+        "mjfc analysis hist f.root --tree events --observable MET_pt --bins 20 --range 0 200",
     )
     modules = parser.add_subparsers(
-        dest="module", metavar="{lit,cms,web,root,parquet}", required=True
+        dest="module",
+        metavar="{lit,cms,web,root,parquet,analysis}",
+        required=True,
     )
 
     # --- lit ---------------------------------------------------------------
@@ -473,6 +520,108 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("path", help="ruta del archivo .parquet")
     p.add_argument("column", help="nombre de la columna")
     p.set_defaults(func=_parquet_summary, action="summary")
+
+    # --- analysis ----------------------------------------------------------
+    analysis = modules.add_parser(
+        "analysis",
+        parents=[common],
+        help="Análisis: selección (cutflow) e histogramas sobre ROOT/Parquet.",
+        description="Análisis: aplica cortes restringidos, cutflows e histogramas con trazabilidad.",
+    )
+    analysis_cmds = analysis.add_subparsers(
+        dest="action", metavar="{select,hist}", required=True
+    )
+    p = analysis_cmds.add_parser(
+        "select",
+        parents=[common],
+        help="Aplica cortes en orden y produce un cutflow JSON.",
+        description=(
+            "Aplica una lista de cortes [{name,expression,source}] a uno o varios archivos "
+            "ROOT/Parquet del mismo formato; salida: cutflow JSON con passed, eficiencias y "
+            "branches_used. --tree es obligatorio para ROOT. --out guarda el JSON completo."
+        ),
+    )
+    p.add_argument(
+        "inputs", nargs="+", help="archivo(s) .root o .parquet del mismo formato"
+    )
+    p.add_argument("--tree", default=None, help="árbol ROOT (obligatorio para .root)")
+    p.add_argument("--cuts", required=True, help="JSON con [{name,expression,source}]")
+    p.add_argument("--out", default=None, help="ruta del cutflow JSON (opcional)")
+    p.add_argument("--label", default=None, help="etiqueta de la muestra (opcional)")
+    p.set_defaults(func=_analysis_select, action="select")
+
+    p = analysis_cmds.add_parser(
+        "hist",
+        parents=[common],
+        help="Llena un histograma con selección, pesos y normalización.",
+        description=(
+            "Llena un histograma de una observable (expresión restringida) sobre uno o varios "
+            "archivos ROOT/Parquet del mismo formato. --mode event: un valor por evento; "
+            "--mode object: un valor por objeto de una rama jagged. --selection y --cuts se "
+            "aplican por evento. --weights es un peso por evento. --object-cut filtra objetos "
+            "de la misma colección que la observable (solo --mode object) y exige "
+            "--object-source. --normalize none (defecto) o "
+            "area (suma de los bins en rango = 1). Salida: bins (edges/counts/underflow/"
+            "overflow/nan), sumw2 y object_cut. --out guarda el JSON completo."
+        ),
+    )
+    p.add_argument(
+        "inputs", nargs="+", help="archivo(s) .root o .parquet del mismo formato"
+    )
+    p.add_argument(
+        "--observable",
+        required=True,
+        help="expresión de la variable a histogramar (p. ej. MET_pt o Muon_pt)",
+    )
+    p.add_argument("--bins", type=int, required=True, help="número de bins (>= 1)")
+    p.add_argument(
+        "--range",
+        nargs=2,
+        type=float,
+        required=True,
+        metavar=("LO", "HI"),
+        help="rango del histograma: --range LO HI (LO < HI, ambos finitos)",
+    )
+    p.add_argument("--tree", default=None, help="árbol ROOT (obligatorio para .root)")
+    p.add_argument(
+        "--mode",
+        choices=("event", "object"),
+        default="event",
+        help="event: un valor por evento (defecto); object: un valor por objeto",
+    )
+    p.add_argument(
+        "--selection",
+        default=None,
+        help="expresión booleana por evento (admite any/all/count/max)",
+    )
+    p.add_argument(
+        "--cuts",
+        default=None,
+        help="JSON con [{name,expression,source}]; se aplican todos, en orden",
+    )
+    p.add_argument(
+        "--weights", default=None, help="expresión de peso por evento (por defecto 1)"
+    )
+    p.add_argument(
+        "--object-cut",
+        default=None,
+        help="corte booleano por objeto de la misma colección (solo --mode object); "
+        "exige --object-source",
+    )
+    p.add_argument(
+        "--object-source",
+        default=None,
+        help="fuente del --object-cut (obligatoria; no vale TODO ni pendiente)",
+    )
+    p.add_argument(
+        "--normalize",
+        choices=("none", "area"),
+        default="none",
+        help="none: recuentos con peso (defecto); area: suma en rango = 1",
+    )
+    p.add_argument("--out", default=None, help="ruta del histograma JSON (opcional)")
+    p.add_argument("--label", default=None, help="etiqueta de la muestra (opcional)")
+    p.set_defaults(func=_analysis_hist, action="hist")
 
     return parser
 
